@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOKOL BARBER — мужские стрижки</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#d4af37;--gold2:#f5d77a;--silver:#c0c0c0;--bg:#070707;--card:#121212;--line:#242424}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:#e8e8e8;font-family:Inter,sans-serif;overflow-x:hidden}
+canvas#stars{position:fixed;inset:0;z-index:-1}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+nav{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(7,7,7,.75);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:Oswald;font-size:22px;letter-spacing:3px;color:var(--silver)}
+.logo span{color:var(--gold)}
+nav ul{display:flex;gap:28px;list-style:none;font-size:14px;color:#aaa}
+nav ul a:hover{color:var(--gold)}
+.btn{display:inline-block;padding:14px 30px;border-radius:40px;font-weight:600;color:#000;background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 25px rgba(212,175,55,.35);transition:.25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(212,175,55,.6)}
+.btn.small{padding:10px 20px;font-size:14px}
+.hero{min-height:100vh;display:flex;align-items:center;text-align:center;padding-top:64px}
+.hero h1{font-family:Oswald;font-size:clamp(48px,9vw,110px);line-height:1;letter-spacing:4px;background:linear-gradient(180deg,#fff,var(--silver) 60%,#777);-webkit-background-clip:text;color:transparent}
+.hero h1 span{background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;color:transparent}
+.hero p{margin:22px auto 36px;max-width:560px;color:#aaa;font-size:18px}
+.badge{display:inline-block;margin-bottom:22px;padding:6px 16px;border:1px solid var(--gold);border-radius:30px;color:var(--gold);font-size:13px;letter-spacing:2px}
+section{padding:100px 0}
+h2{font-family:Oswald;font-size:clamp(34px,5vw,52px);letter-spacing:2px;margin-bottom:12px}
+h2 span{color:var(--gold)}
+.sub{color:#888;margin-bottom:46px}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;transition:.3s}
+.card:hover{border-color:var(--gold);transform:translateY(-6px);box-shadow:0 10px 40px rgba(212,175,55,.12)}
+.card .ico{font-size:34px;margin-bottom:14px}
+.card h3{font-family:Oswald;font-size:22px;margin-bottom:8px}
+.card p{color:#999;font-size:14px;margin-bottom:18px}
+.price{font-family:Oswald;font-size:28px;color:var(--gold)}
+.master{text-align:center}
+.ava{width:110px;height:110px;margin:0 auto 18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Oswald;font-size:44px;color:#000;background:linear-gradient(135deg,var(--gold2),var(--gold),#6b5a1e)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;text-align:center}
+.stat b{display:block;font-family:Oswald;font-size:56px;color:var(--gold)}
+.stat span{color:#888}
+.review{font-style:italic;color:#ccc}
+.review b{display:block;margin-top:14px;font-style:normal;color:var(--gold)}
+.stars{color:var(--gold);margin-bottom:10px}
+.cta{text-align:center;background:linear-gradient(135deg,#1a1505,#070707 60%);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.contacts{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+footer{padding:30px 0;text-align:center;color:#555;font-size:13px}
+.reveal{opacity:0;transform:translateY(30px);transition:1s}
+.reveal.show{opacity:1;transform:none}
+@media(max-width:760px){nav ul{display:none}}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<nav><div class="wrap">
+  <a href="#" class="logo">SOKOL <span>BARBER</span></a>
+  <ul><li><a href="#services">Услуги</a></li><li><a href="#masters">Мастера</a></li><li><a href="#reviews">Отзывы</a></li><li><a href="#contacts">Контакты</a></li></ul>
+  <a href="#book" class="btn small">Записаться</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="badge">МУЖСКАЯ ПАРИКМАХЕРСКАЯ</div>
+  <h1>SOKOL<br><span>BARBER</span></h1>
+  <p>Точные стрижки, идеальные бороды и атмосфера, в которую хочется вернуться. Запись за 30 секунд в Telegram.</p>
+  <a href="#book" class="btn">Записаться онлайн</a>
+</div></header>
+
+<section id="services"><div class="wrap">
+  <h2 class="reveal">НАШИ <span>УСЛУГИ</span></h2>
+  <p class="sub reveal">Честные цены, без сюрпризов</p>
+  <div class="grid">
+    <div class="card reveal"><div class="ico">✂️</div><h3>Мужская стрижка</h3><p>Консультация, мытьё головы, стрижка и укладка</p><div class="price">1 500 ₽</div></div>
+    <div class="card reveal"><div class="ico">🧔</div><h3>Борода</h3><p>Моделирование, контур опасной бритвой, уход</p><div class="price">900 ₽</div></div>
+    <div class="card reveal"><div class="ico">🔥</div><h3>Стрижка + борода</h3><p>Полный образ за один визит, выгоднее на 200 ₽</p><div class="price">2 200 ₽</div></div>
+    <div class="card reveal"><div class="ico">🪒</div><h3>Королевское бритьё</h3><p>Горячее полотенце, опасная бритва, уход за кожей</p><div class="price">1 300 ₽</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap stats">
+  <div class="stat reveal"><b class="count" data-to="5000">0</b><span>довольных клиентов</span></div>
+  <div class="stat reveal"><b class="count" data-to="3">0</b><span>топовых мастера</span></div>
+  <div class="stat reveal"><b class="count" data-to="6">0</b><span>лет опыта</span></div>
+  <div class="stat reveal"><b>4.9★</b><span>средняя оценка</span></div>
+</div></section>
+
+<section id="masters"><div class="wrap">
+  <h2 class="reveal">НАШИ <span>МАСТЕРА</span></h2>
+  <p class="sub reveal">Каждый — профи в своём деле</p>
+  <div class="grid">
+    <div class="card master reveal"><div class="ava">М</div><h3>Макс</h3><p>Фейды и классика, 6 лет опыта</p></div>
+    <div class="card master reveal"><div class="ava">А</div><h3>Артём</h3><p>Бороды и укладки, 4 года</p></div>
+    <div class="card master reveal"><div class="ava">Д</div><h3>Дима</h3><p>Креативные стрижки, 5 лет</p></div>
+  </div>
+</div></section>
+
+<section id="reviews"><div class="wrap">
+  <h2 class="reveal">ОТЗЫВЫ <span>КЛИЕНТОВ</span></h2>
+  <p class="sub reveal">Что говорят о нас</p>
+  <div class="grid">
+    <div class="card reveal"><div class="stars">★★★★★</div><p class="review">Лучший фейд в моей жизни. Записался через бота за полминуты.<b>— Иван</b></p></div>
+    <div class="card reveal"><div class="stars">★★★★★</div><p class="review">Атмосфера огонь, Артём сделал бороду просто идеально.<b>— Сергей</b></p></div>
+    <div class="card reveal"><div class="stars">★★★★★</div><p class="review">Бот сам напомнил о записи — удобно, ничего не забыл.<b>— Алексей</b></p></div>
+  </div>
+</div></section>
+
+<section id="book" class="cta"><div class="wrap">
+  <h2 class="reveal">ГОТОВ К <span>НОВОМУ ОБРАЗУ?</span></h2>
+  <p class="sub reveal">Выбери услугу, мастера и время прямо в Telegram</p>
+  <a href="https://t.me/Barbershottbot" class="btn reveal">Записаться в Telegram</a>
+</div></section>
+
+<section id="contacts"><div class="wrap">
+  <h2 class="reveal"><span>КОНТАКТЫ</span></h2>
+  <p class="sub reveal">Ждём тебя</p>
+  <div class="contacts">
+    <div class="card reveal"><div class="ico">📍</div><h3>Адрес</h3><p>г. Мытищи, ул. Примерная, 1</p></div>
+    <div class="card reveal"><div class="ico">🕙</div><h3>Режим работы</h3><p>Ежедневно 10:00–21:00</p></div>
+    <div class="card reveal"><div class="ico">📞</div><h3>Телефон</h3><p>+7 (900) 000-00-00</p></div>
+  </div>
+</div></section>
+
+<footer>© SOKOL BARBER · Сайт сделан в Sokol Plus</footer>
+
+<script>
+const c=document.getElementById("stars"),x=c.getContext("2d");let S=[];
+function size(){c.width=innerWidth;c.height=innerHeight;S=[...Array(180)].map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.4+.2,v:Math.random()*.3+.05,t:Math.random()*6}))}
+size();addEventListener("resize",size);
+(function draw(){x.clearRect(0,0,c.width,c.height);S.forEach(s=>{s.y+=s.v;s.t+=.03;if(s.y>c.height){s.y=0;s.x=Math.random()*c.width}
+x.globalAlpha=.4+Math.sin(s.t)*.4;x.fillStyle=Math.random()<.002?"#d4af37":(s.r>1.2?"#f5d77a":"#fff");x.beginPath();x.arc(s.x,s.y,s.r,0,7);x.fill()});requestAnimationFrame(draw)})();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("show");
+  const n=e.target.querySelector?.(".count")||(e.target.classList.contains("count")?e.target:null);
+  if(n&&!n.done){n.done=1;const to=+n.dataset.to;let v=0;const st=Math.max(1,to/60);const i=setInterval(()=>{v+=st;if(v>=to){v=to;clearInterval(i)}n.textContent=Math.floor(v)+(to>=1000?"+":"")},20)}}}),{threshold:.2});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
