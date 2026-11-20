@@ -1,0 +1,106 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Барбершоп</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif}
+body{background:#0b0b0b;color:#eee;min-height:100vh;padding-bottom:90px}
+header{padding:24px 16px 12px;text-align:center}
+header h1{font-size:28px;letter-spacing:2px;background:linear-gradient(90deg,#d4af37,#f5d77a,#b8860b);-webkit-background-clip:text;color:transparent}
+header p{color:#999;font-size:13px;margin-top:4px}
+.tabs{display:flex;gap:8px;padding:0 16px;margin:12px 0}
+.tab{flex:1;padding:10px;border-radius:12px;background:#1a1a1a;color:#aaa;border:1px solid #2a2a2a;font-size:14px;text-align:center;cursor:pointer}
+.tab.active{background:linear-gradient(135deg,#d4af37,#b8860b);color:#000;font-weight:700;border:none}
+.page{display:none;padding:0 16px}
+.page.active{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h3{color:#d4af37;font-size:15px;margin:16px 0 8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{padding:12px;border-radius:12px;background:#161616;border:1px solid #2a2a2a;cursor:pointer;font-size:14px}
+.opt small{display:block;color:#888;margin-top:4px}
+.opt.sel{border-color:#d4af37;background:#1f1a0a;box-shadow:0 0 12px rgba(212,175,55,.3)}
+input{width:100%;padding:12px;border-radius:12px;background:#161616;border:1px solid #2a2a2a;color:#eee;font-size:15px;margin-bottom:8px}
+.card{display:flex;gap:12px;align-items:center;padding:14px;border-radius:14px;background:#161616;border:1px solid #2a2a2a;margin-bottom:10px}
+.ava{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#555);display:flex;align-items:center;justify-content:center;font-size:24px;color:#000;font-weight:700}
+.card b{color:#f5d77a}
+.row{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #222}
+.row span:last-child{color:#d4af37;font-weight:700}
+.btn{position:fixed;left:16px;right:16px;bottom:20px;padding:16px;border:none;border-radius:14px;font-size:17px;font-weight:700;color:#000;background:linear-gradient(90deg,#d4af37,#f5d77a);cursor:pointer}
+.btn:disabled{opacity:.35}
+</style>
+</head>
+<body>
+<header><h1>✂ BARBER</h1><p>Запись к мастеру за 30 секунд</p></header>
+
+<div class="tabs">
+<div class="tab active" data-p="book">Записаться</div>
+<div class="tab" data-p="masters">Мастера</div>
+<div class="tab" data-p="price">Прайс</div>
+</div>
+
+<div class="page active" id="book">
+<h3>Услуга</h3><div class="grid" id="services"></div>
+<h3>Мастер</h3><div class="grid" id="mastersPick"></div>
+<h3>День</h3><div class="grid" id="days"></div>
+<h3>Время</h3><div class="grid" id="times"></div>
+<h3>Контакты</h3>
+<input id="name" placeholder="Твоё имя">
+<input id="phone" placeholder="Телефон" type="tel">
+</div>
+
+<div class="page" id="masters"></div>
+<div class="page" id="price"></div>
+
+<button class="btn" id="send" disabled>Записаться</button>
+
+<script>
+const tg = window.Telegram.WebApp; tg.expand();
+const SERVICES = [["cut","Мужская стрижка",1500],["beard","Борода",900],["combo","Стрижка + борода",2200]];
+const MASTERS = [["max","Макс","Фейды и классика, 6 лет опыта"],["artem","Артём","Бороды и укладки, 4 года"],["dima","Дима","Креативные стрижки, 5 лет"]];
+const TIMES = ["10:00","12:00","14:00","16:00","18:00"];
+const s = {};
+
+function opts(id, items, key){
+const box = document.getElementById(id); box.innerHTML = "";
+items.forEach(([val, label, sub])=>{
+const d = document.createElement("div"); d.className = "opt";
+d.innerHTML = label + (sub ? `<small>${sub}</small>` : "");
+d.onclick = ()=>{ [...box.children].forEach(c=>c.classList.remove("sel")); d.classList.add("sel"); s[key]=val; check(); };
+box.appendChild(d);
+});
+}
+const days = [...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()+i);
+return [d.toISOString().slice(0,10), d.toLocaleDateString("ru",{weekday:"short",day:"numeric",month:"short"})];});
+
+opts("services", SERVICES.map(([k,n,p])=>[k,n,p+" ₽"]), "service");
+opts("mastersPick", MASTERS.map(([k,n])=>[k,n]), "master");
+opts("days", days, "day");
+opts("times", TIMES.map(t=>[t,t]), "time");
+
+document.getElementById("masters").innerHTML = MASTERS.map(([,n,d])=>
+`<div class="card"><div class="ava">${n[0]}</div><div><b>${n}</b><br><small style="color:#999">${d}</small></div></div>`).join("");
+document.getElementById("price").innerHTML = SERVICES.map(([,n,p])=>
+`<div class="row"><span>${n}</span><span>${p} ₽</span></div>`).join("");
+
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+document.querySelectorAll(".tab,.page").forEach(e=>e.classList.remove("active"));
+t.classList.add("active"); document.getElementById(t.dataset.p).classList.add("active");
+document.getElementById("send").style.display = t.dataset.p==="book" ? "block" : "none";
+});
+
+const nameI = document.getElementById("name"), phoneI = document.getElementById("phone");
+nameI.oninput = phoneI.oninput = check;
+function check(){
+document.getElementById("send").disabled = !(s.service && s.master && s.day && s.time && nameI.value.trim() && phoneI.value.trim());
+}
+document.getElementById("send").onclick = ()=>{
+tg.sendData(JSON.stringify({...s, name:nameI.value.trim(), phone:phoneI.value.trim()}));
+tg.close();
+};
+</script>
+</body>
+</html>
